@@ -133,7 +133,9 @@ class UserController extends Controller
                     'name' => $request->name,
                     'email' => $request->email,
                     'password' => Hash::make($request->password),
-                    'roles' => $request->roles
+                    'roles' => $request->roles,
+                    'ormawa' => $request->ormawa,
+                    'prodi' => $request->prodi,
                 ]);
 
                 DB::commit();

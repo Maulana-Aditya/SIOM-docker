@@ -75,37 +75,67 @@
             </div>
 
             <!-- RINCIAN ANGGARAN -->
-            <h5 class="mt-4">Realisasi Anggaran Dana</h5><hr>
-            <table class="table table-bordered" id="tabelAnggaran">
-                <thead>
-                    <tr class="table-primary text-center">
-                        <th>Rincian Kebutuhan</th>
-                        <th>Volume</th>
-                        <th>Satuan</th>
-                        <th>Harga Satuan (Rp)</th>
-                        <th>Jumlah Total (Rp)</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="text" name="anggaran[0][uraian]" class="form-control" required></td>
-                        <td><input type="number" name="anggaran[0][volume]" class="form-control volume" required></td>
-                        <td><input type="text" name="anggaran[0][satuan]" class="form-control" placeholder="pcs / buah / lusin" required></td>
-                        <td><input type="number" name="anggaran[0][harga_satuan]" class="form-control harga_satuan" required></td>
-                        <td><input type="number" name="anggaran[0][jumlah_total]" class="form-control jumlah_total" readonly></td>
-                        <td><button type="button" class="btn btn-danger btn-sm hapusBaris">Hapus</button></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="table-secondary">
-                        <td colspan="4" class="text-end"><strong>Total Keseluruhan:</strong></td>
-                        <td><input type="number" id="totalKeseluruhan" class="form-control" readonly></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-            <button type="button" class="btn btn-secondary mb-3" id="tambahBaris">+ Tambah Baris</button><br>
+<h5 class="mt-4">Realisasi Anggaran Dana</h5><hr>
+<table class="table table-bordered" id="tabelAnggaran">
+    <thead>
+        <tr class="table-primary text-center">
+            <th>Rincian Kebutuhan</th>
+            <th>Volume</th>
+            <th>Satuan</th>
+            <th>Harga Satuan (Rp)</th>
+            <th>Jumlah Total (Rp)</th>
+            <th>Bukti Nota</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><input type="text" name="anggaran[0][uraian]" class="form-control" required></td>
+            <td><input type="number" name="anggaran[0][volume]" class="form-control volume" required></td>
+            <td><input type="text" name="anggaran[0][satuan]" class="form-control" required></td>
+            <td><input type="number" name="anggaran[0][harga_satuan]" class="form-control harga_satuan" required></td>
+            <td><input type="number" name="anggaran[0][jumlah_total]" class="form-control jumlah_total" readonly></td>
+            <td><input type="file" name="anggaran[0][nota]" accept="image/*,.pdf" class="form-control" required></td>
+            <td><button type="button" class="btn btn-danger btn-sm hapusBaris">Hapus</button></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr class="table-secondary">
+            <td colspan="4" class="text-end"><strong>Total Keseluruhan:</strong></td>
+            <td><input type="number" id="totalKeseluruhan" class="form-control" readonly></td>
+            <td colspan="2"></td>
+        </tr>
+    </tfoot>
+</table>
+<button type="button" class="btn btn-secondary mb-3" id="tambahBaris">+ Tambah Baris</button><br>
+
+<!-- FORM RUNDOWN KEGIATAN -->
+<h5 class="mt-4">Rundown Kegiatan</h5><hr>
+<table class="table table-bordered" id="tabelRundown">
+    <thead>
+        <tr class="table-primary text-center">
+            <th>No</th>
+            <th>Jam</th>
+            <th>Durasi</th>
+            <th>Kegiatan</th>
+            <th>Penanggung Jawab</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="text-center align-middle">1</td>
+            <td><input type="text" name="rundown[0][jam]" class="form-control" placeholder="08.00 - 09.00" required></td>
+            <td><input type="text" name="rundown[0][durasi]" class="form-control" placeholder="1 jam" required></td>
+            <td><input type="text" name="rundown[0][kegiatan]" class="form-control" required></td>
+            <td><input type="text" name="rundown[0][penanggung_jawab]" class="form-control" required></td>
+            <td><button type="button" class="btn btn-danger btn-sm hapusBarisRundown">Hapus</button></td>
+        </tr>
+    </tbody>
+</table>
+<button type="button" class="btn btn-secondary mb-3" id="tambahBarisRundown">+ Tambah Baris</button>
+<br>
+
 
             <!-- DOKUMENTASI KEGIATAN -->
             <h5 class="mt-4">Dokumentasi Kegiatan</h5><hr>
@@ -116,14 +146,7 @@
                 <small class="text-muted">Format: JPEG/PNG (Maks 2MB per file)</small>
             </div>
 
-            <!-- NOTA PEMBELIAN -->
-            <h5 class="mt-4">Nota Pembelian</h5><hr>
-            <div class="form-group">
-                <label>Upload Nota Pembelian (Maksimal 10 file)</label>
-                <input type="file" name="nota[]" id="nota" 
-                       class="form-control" multiple accept="image/*,.pdf" max="10">
-                <small class="text-muted">Format: JPEG/PNG/PDF (Maks 2MB per file)</small>
-            </div>
+            
 
             <!-- PREVIEW FILE YANG AKAN DIUPLOAD -->
             <div class="row mt-4">
@@ -158,6 +181,7 @@
 </section>
 
 {{-- Script Tambah Baris Dinamis dan Hitung Total --}}
+<!-- SCRIPT -->
 <script>
     let index = 1;
 
@@ -167,9 +191,10 @@
         row.innerHTML = `
             <td><input type="text" name="anggaran[${index}][uraian]" class="form-control" required></td>
             <td><input type="number" name="anggaran[${index}][volume]" class="form-control volume" required></td>
-            <td><input type="text" name="anggaran[${index}][satuan]" class="form-control" placeholder="pcs / buah / lusin" required></td>
+            <td><input type="text" name="anggaran[${index}][satuan]" class="form-control" required></td>
             <td><input type="number" name="anggaran[${index}][harga_satuan]" class="form-control harga_satuan" required></td>
             <td><input type="number" name="anggaran[${index}][jumlah_total]" class="form-control jumlah_total" readonly></td>
+            <td><input type="file" name="anggaran[${index}][nota]" accept="image/*,.pdf" class="form-control" required></td>
             <td><button type="button" class="btn btn-danger btn-sm hapusBaris">Hapus</button></td>
         `;
         table.appendChild(row);
@@ -201,7 +226,7 @@
         document.getElementById('totalKeseluruhan').value = totalKeseluruhan;
     }
 
-    // Preview untuk dokumentasi
+    // Preview Dokumentasi
     document.getElementById('dokumentasi').addEventListener('change', function(e) {
         const previewContainer = document.getElementById('previewDokumentasi');
         previewContainer.innerHTML = '';
@@ -225,41 +250,77 @@
         }
     });
 
-    // Preview untuk nota
-    document.getElementById('nota').addEventListener('change', function(e) {
-        const previewContainer = document.getElementById('previewNota');
-        previewContainer.innerHTML = '';
-        
-        if (this.files.length > 0) {
-            Array.from(this.files).forEach(file => {
-                const div = document.createElement('div');
-                div.className = 'mb-2';
-                
-                if (file.type.match('image.*')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'img-thumbnail m-1';
-                        img.style.maxHeight = '100px';
-                        div.appendChild(img);
-                        div.innerHTML += `<div>${file.name}</div>`;
+    // Preview Nota
+    document.getElementById('previewNota').innerHTML = '<p class="text-muted">Belum ada file dipilih</p>';
+    document.addEventListener('change', function (e) {
+        if (e.target.name.includes('[nota]')) {
+            const previewContainer = document.getElementById('previewNota');
+            previewContainer.innerHTML = '';
+
+            const files = e.target.files;
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    const div = document.createElement('div');
+                    div.className = 'mb-2';
+
+                    if (file.type.match('image.*')) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'img-thumbnail m-1';
+                            img.style.maxHeight = '100px';
+                            div.appendChild(img);
+                            div.innerHTML += `<div>${file.name}</div>`;
+                            previewContainer.appendChild(div);
+                        }
+                        reader.readAsDataURL(file);
+                    } else if (file.type === 'application/pdf') {
+                        div.innerHTML = `
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-pdf fa-2x text-danger me-2"></i>
+                                <div>${file.name}</div>
+                            </div>
+                        `;
                         previewContainer.appendChild(div);
                     }
-                    reader.readAsDataURL(file);
-                } else if (file.type === 'application/pdf') {
-                    div.innerHTML = `
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-file-pdf fa-2x text-danger me-2"></i>
-                            <div>${file.name}</div>
-                        </div>
-                    `;
-                    previewContainer.appendChild(div);
-                }
-            });
-        } else {
-            previewContainer.innerHTML = '<p class="text-muted">Belum ada file dipilih</p>';
+                });
+            } else {
+                previewContainer.innerHTML = '<p class="text-muted">Belum ada file dipilih</p>';
+            }
         }
     });
+
+    // RUNDOWN SECTION ✅
+    document.getElementById('tambahBarisRundown').addEventListener('click', function () {
+        const table = document.querySelector('#tabelRundown tbody');
+        const rows = table.querySelectorAll('tr');
+        const newIndex = rows.length;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center align-middle">${newIndex + 1}</td>
+            <td><input type="text" name="rundown[${newIndex}][jam]" class="form-control" placeholder="08.00 - 09.00" required></td>
+            <td><input type="text" name="rundown[${newIndex}][durasi]" class="form-control" placeholder="1 jam" required></td>
+            <td><input type="text" name="rundown[${newIndex}][kegiatan]" class="form-control" required></td>
+            <td><input type="text" name="rundown[${newIndex}][penanggung_jawab]" class="form-control" required></td>
+            <td><button type="button" class="btn btn-danger btn-sm hapusBarisRundown">Hapus</button></td>
+        `;
+        table.appendChild(row);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('hapusBarisRundown')) {
+            e.target.closest('tr').remove();
+            urutkanNomorRundown();
+        }
+    });
+
+    function urutkanNomorRundown() {
+        const rows = document.querySelectorAll('#tabelRundown tbody tr');
+        rows.forEach((row, i) => {
+            row.querySelector('td:first-child').textContent = i + 1;
+        });
+    }
 </script>
 @endsection

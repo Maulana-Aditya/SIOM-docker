@@ -1,7 +1,7 @@
 <footer class="main-footer text-center py-3">
     <div class="w-100">
         &copy; {{ now()->year }} &bull; Developed by 
-        <a href="https://pixeloverture.net" target="_blank">SIOM SOEPRAOEN</a> — v3.3.0
+        <a href="https://pixeloverture.net" target="_blank">SIOM SOEPRAOEN</a> — v1.0 beta
     </div>
 </footer>
 

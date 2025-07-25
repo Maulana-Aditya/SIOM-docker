@@ -1,128 +1,91 @@
 @extends('layouts.main')
-@section('title', 'List Pengumuman')
+
+@section('title', 'Data Pengumuman')
 
 @section('content')
-    <section class="section custom-section">
-        <div class="section-body">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h4>List Mata Pelajaran</h4>
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"><i
-                                    class="nav-icon fas fa-folder-plus"></i>&nbsp; Tambah Data Pengumuman</button>
-                        </div>
-                        <div class="card-body">
-                            @include('partials.alert')
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="table-2">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Mulai</th>
-                                            <th>Selesai</th>
-                                            <th>Pengumuman</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($pengumumans as $result => $data)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $data->start_at }}</td>
-                                                <td>{{ $data->end_at }}</td>
-                                                <td>{{ $data->description }}</td>
-                                                <td>
-                                                    <div class="d-flex">
-                                                        <a href="{{ route('pengumuman-sekolah.edit', Crypt::encrypt($data->id)) }}"
-                                                            class="btn btn-success btn-sm"><i
-                                                                class="nav-icon fas fa-edit"></i> &nbsp; Edit</a>
-                                                        <form method="POST"
-                                                            action="{{ route('pengumuman-sekolah.destroy', $data->id) }}">
-                                                            @csrf
-                                                            @method('delete')
-                                                            <button class="btn btn-danger btn-sm show_confirm"
-                                                                data-toggle="tooltip" title='Delete'
-                                                                style="margin-left: 8px"><i
-                                                                    class="nav-icon fas fa-trash-alt"></i> &nbsp;
-                                                                Hapus</button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal fade" tabindex="-1" role="dialog" id="exampleModal">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Tambah Pengumuman</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="{{ route('pengumuman-sekolah.store') }}" method="POST">
-                                    @csrf
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="start_at">Tanggal Mulai</label>
-                                                <input type="date" id="start_at" name="start_at"
-                                                    class="form-control @error('start_at') is-invalid @enderror"
-                                                    placeholder="Tanggal Mulai" value="{{ old('start_at') }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="end_at">Tanggal Selesai</label>
-                                                <input type="date" id="end_at" name="end_at"
-                                                    class="form-control @error('end_at') is-invalid @enderror"
-                                                    placeholder="Tanggal Selesai" value="{{ old('end_at') }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="description">Deskripsi</label>
-                                                <input type="text" id="description" name="description"
-                                                    class="form-control @error('description') is-invalid @enderror"
-                                                    placeholder="{{ __('Deskripsi pengumuman') }}" value="{{ old('description') }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer br">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-primary">Simpan</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-@endsection
+<section class="section">
+    <div class="section-header d-flex justify-content-between w-100">
+        <h1>Daftar Pengumuman</h1>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#modalPengumuman">
+            <i class="fas fa-plus"></i> Tambah Pengumuman
+        </button>
+    </div>
 
-@push('script')
-    <script type="text/javascript">
-        $('.show_confirm').click(function(event) {
-            var form = $(this).closest("form");
-            var name = $(this).data("name");
-            event.preventDefault();
-            swal({
-                    title: `Yakin ingin menghapus data ini?`,
-                    text: "Data akan terhapus secara permanen!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                })
-                .then((willDelete) => {
-                    if (willDelete) {
-                        form.submit();
-                    }
-                });
-        });
-    </script>
-@endpush
+    <div class="section-body">
+        @include('partials.alert')
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Judul</th>
+                        <th>Deskripsi</th>
+                        <th>File</th>
+                        <th>Dibuat</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($pengumumans as $pengumuman)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $pengumuman->judul }}</td>
+                        <td>{{ $pengumuman->deskripsi }}</td>
+                        <td>
+                            <a href="{{ asset('storage/' . $pengumuman->file_path) }}" target="_blank" class="btn btn-sm btn-info">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </td>
+                        <td>{{ $pengumuman->created_at->format('d M Y') }}</td>
+                        <td>
+                            <a href="{{ route('pengumuman.edit', $pengumuman->id) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                            <form action="{{ route('pengumuman.destroy', $pengumuman->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus pengumuman ini?')">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                    @if($pengumumans->isEmpty())
+                    <tr><td colspan="6" class="text-center">Belum ada pengumuman.</td></tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+{{-- Modal Tambah Pengumuman --}}
+<div class="modal fade" id="modalPengumuman" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <form action="{{ route('pengumuman.store') }}" method="POST" enctype="multipart/form-data" class="modal-content">
+      @csrf
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Pengumuman</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label>Judul</label>
+            <input type="text" name="judul" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Deskripsi</label>
+            <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>File Pengumuman (PDF)</label>
+            <input type="file" name="file" accept=".pdf" class="form-control-file" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+@endsection

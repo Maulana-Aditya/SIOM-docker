@@ -4,169 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Login - SIOM')</title>
+
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Mengambil variabel warna dari tema utama */
-        :root {
-            --primary-color: #00d8ff;
-            --dark-blue: #000033;
-            --light-text: #e0e0e0;
-            --white-color: #ffffff;
-        }
+    :root {
+        --primary-color: #00d8ff;
+        --dark-blue: #000033;
+        --light-text: #e0e0e0;
+        --white-color: #ffffff;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        html, body {
-            height: 100%;
-        }
+    body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 51, 0.85)),
+                url('{{ asset("assets/img/itsk.jpeg.jpg") }}') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--white-color);
+}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 51, 0.9)), url('{{ asset("assets/img/itsk.jpeg.jpg") }}') no-repeat center center fixed;
-            background-size: cover;
-            color: var(--white-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+    body.login-page {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 51, 0.85)),
+                    url('{{ asset("assets/img/itsk.jpeg.jpg") }}') no-repeat center center fixed;
+        background-size: cover;
+    }
 
-        /* Container utama untuk kartu login */
-        .auth-card {
-            background-color: rgba(0, 0, 20, 0.75);
-            padding: 30px 40px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            backdrop-filter: blur(4px);
-        }
-        
-        /* Header kartu: Logo dan judul */
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    .auth-card {
+        background-color: rgba(0, 0, 20, 0.75);
+        padding: 30px 40px;
+        border-radius: 12px;
+        max-width: 450px;
+        width: 100%;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(6px);
+    }
 
-        .auth-header h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-        
-        .auth-header p {
-            color: var(--light-text);
-            font-size: 0.9rem;
-        }
+    .form-control {
+        background-color: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+    }
 
-        /* Styling untuk form */
-        .form-group {
-            margin-bottom: 20px;
-        }
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--light-text);
-        }
+    .form-control:focus {
+        background-color: rgba(255,255,255,0.08) !important;
+        color: #fff !important;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0,216,255,0.3);
+    }
 
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--white-color);
-            font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 216, 255, 0.2);
-        }
-        
-        .form-control.is-invalid {
-            border-color: #dc3545;
-        }
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: #000;
+        border: none;
+    }
 
-        .invalid-feedback {
-            color: #dc3545;
-            font-size: 0.875em;
-            display: block;
-            margin-top: .25rem;
-        }
+    .btn-primary:hover {
+        background-color: #00b8d4;
+        color: #fff;
+    }
 
-        /* Tombol Login */
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background-color: var(--primary-color);
-            color: #000;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        .btn-primary:hover {
-            background-color: #00b8d4;
-            color: var(--white-color);
-        }
+    .text-small {
+        font-size: 0.9rem;
+        color: var(--light-text);
+    }
 
-        /* Link "Lupa Password" dan lainnya */
-        .text-small {
-            font-size: 0.85rem;
-            color: var(--light-text);
-            text-decoration: none;
-        }
-        
-        .text-small:hover {
-            color: var(--primary-color);
-        }
-        
-        /* Footer kartu: Link untuk daftar */
-        .auth-footer {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--light-text);
-        }
-        
-        .auth-footer a {
-            color: var(--primary-color);
-            font-weight: 600;
-            text-decoration: none;
-        }
+    .text-small:hover {
+        color: var(--primary-color);
+    }
 
-        /* Remember me checkbox */
-        .custom-control-label {
-             color: var(--light-text);
-        }
+    .overlay-container {
+        min-height: 100vh;
+        padding: 50px 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(3px);
+    }
 
-    </style>
+    /* Autofill fix */
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        background-color: rgba(255,255,255,0.08) !important;
+        -webkit-box-shadow: 0 0 0 1000px rgba(255,255,255,0.08) inset !important;
+        -webkit-text-fill-color: #fff !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+    select.form-control {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Tambahan penting */
+    select.form-control option {
+        background-color: #111 !important; /* Warna dropdown item */
+        color: white !important;           /* Warna teks item */
+    }
+</style>
+
+    @stack('styles')
 </head>
-<body>
-
+<body class="{{ request()->is('login') ? 'login-page' : '' }}">
     @yield('content')
 
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-      AOS.init({
-        duration: 800,
-        once: true
-      });
+        AOS.init({
+            duration: 800,
+            once: true
+        });
     </script>
+    @stack('scripts')
 </body>
 </html>

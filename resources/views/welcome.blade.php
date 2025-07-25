@@ -319,7 +319,7 @@
       <a href="{{ url('/') }}">Home</a>
  
       <a href="{{ url('/about') }}">Tentang</a>
-      <a href="{{ url('/services') }}">Service</a>
+      <a href="{{ url('/informasi/pengumuman') }}">Pengumuman</a>
       <a href="{{ url('/help') }}">Bantuan</a>
       
       

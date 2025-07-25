@@ -8,7 +8,6 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\MateriController;
 use App\Http\Controllers\PengaturanController;
-use App\Http\Controllers\PengumumanSekolahController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TugasController;
 use App\Http\Controllers\UserController;
@@ -20,7 +19,8 @@ use App\Http\Controllers\KemahasiswaanLPJController;
 use App\Http\Controllers\WarekProposalController;
 use App\Http\Controllers\WarekLPJController;
 use App\Http\Controllers\KaprodiProposalController;
-
+use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\LandingPengumumanController;
 use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\PengaturanDanaController;
@@ -192,7 +192,7 @@ Route::group(['middleware' => ['auth', 'checkRole:admin']], function () {
     Route::resource('siswa', SiswaController::class);
     Route::resource('user', UserController::class);
     Route::resource('jadwal', JadwalController::class);
-    Route::resource('pengumuman-sekolah', PengumumanSekolahController::class);
+    Route::resource('pengumuman', PengumumanController::class);
     Route::resource('pengaturan', PengaturanController::class);
     Route::get('/admin/proposal', [ProposalController::class, 'listProposalAdmin'])->name('admin.proposal.list');
     Route::get('/admin/proposal/acc/{id}', [ProposalController::class, 'accByAdmin'])->name('proposal.acc.admin');
@@ -212,6 +212,10 @@ Route::group(['middleware' => ['auth', 'checkRole:admin']], function () {
     Route::post('/{id}/aktifkan', [PeriodeController::class, 'setAktif'])->name('admin.periode.aktifkan');
     Route::delete('/{id}', [PeriodeController::class, 'destroy'])->name('admin.periode.destroy');
 });
+
+// Landing Page Public
+Route::get('/informasi/pengumuman', [LandingPengumumanController::class, 'index'])->name('landing.pengumuman');
+Route::get('/informasi/pengumuman/{pengumuman}', [LandingPengumumanController::class, 'show'])->name('landing.pengumuman.show');
 
 Route::post('/set-periode', function (Illuminate\Http\Request $request) {
     session(['periode_terpilih' => $request->periode_id]);

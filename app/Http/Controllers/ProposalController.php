@@ -8,6 +8,7 @@ use App\Notifications\ProposalStatusChanged;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 
 class ProposalController extends Controller
@@ -25,6 +26,7 @@ class ProposalController extends Controller
         $request->validate([
             'nomor_urut' => 'required|string',
             'bulan_romawi' => 'required|string',
+            'tanggal_kegiatan' => 'required|date|after_or_equal:' . Carbon::now()->addDays(30)->toDateString(),
             'tahun' => 'required|string',
             'ormawa' => 'required|string',
             'dari' => 'required|string',
@@ -56,7 +58,9 @@ class ProposalController extends Controller
             'rundown.*.durasi' => 'required|string',
             'rundown.*.kegiatan' => 'required|string',
             'rundown.*.penanggung_jawab' => 'required|string',
-        ]);
+        ], [
+        'tanggal_kegiatan.after_or_equal' => 'Tanggal kegiatan minimal H-30 hari dari hari ini.',
+    ]);
 
         // Hitung total keseluruhan anggaran
         $totalKeseluruhan = array_sum(array_column($request->anggaran, 'jumlah_total'));
@@ -125,6 +129,7 @@ $rowCount = count($anggaranList);
         $templateProcessor->setValue('jumlah_dana', number_format($request->jumlah_dana, 0, ',', '.'));
         $templateProcessor->setValue('terbilang_dana', $request->terbilang_dana);
         $templateProcessor->setValue('tanggal_surat', date('d F Y', strtotime($request->tanggal_surat)));
+        $templateProcessor->setValue('tanggal_kegiatan', date('d F Y', strtotime($request->tanggal_kegiatan)));
 
         foreach ($anggaranList as $index => $item) {
             $i = $index + 1; // Placeholder numbering starts from 1
@@ -184,6 +189,7 @@ $templateProcessor->setValue('nim_ketua', $request->nim_ketua);
 $templateProcessor->setValue('jumlah_dana', number_format($request->jumlah_dana, 0, ',', '.'));
 $templateProcessor->setValue('terbilang_dana', $request->terbilang_dana);
 $templateProcessor->setValue('tanggal_surat', date('d F Y', strtotime($request->tanggal_surat)));
+$templateProcessor->setValue('tanggal_kegiatan', date('d F Y', strtotime($request->tanggal_kegiatan)));
 
 // Isi data anggaran ke dua tempat
 foreach ($anggaranList as $index => $item) {
@@ -260,13 +266,32 @@ return redirect()->route('ormawa.proposal')->with('success', 'Proposal berhasil 
     }
 
     // ✅ Fungsi List Proposal untuk Admin
-    public function listProposalAdmin()
-    {
-        $proposals = Proposal::where('status', '!=', 'acc_final')
-                             ->where('periode_id', periode_terpilih_id()) // Tambahkan filter periode
-                             ->get();
-        return view('pages.admin.mapel.index', compact('proposals'));
+    public function listProposalAdmin(Request $request)
+{
+    $query = Proposal::where('status', '!=', 'acc_final')
+                     ->where('periode_id', periode_terpilih_id());
+
+    // Filter judul
+    if ($request->filled('search')) {
+        $query->where('judul_kegiatan', 'like', '%' . $request->search . '%');
     }
+
+    // Filter status
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // Filter tanggal pengajuan (created_at)
+    if ($request->filled('tanggal')) {
+        $query->whereDate('created_at', $request->tanggal);
+    }
+
+    // Ambil data dengan pagination 10 per halaman
+    $proposals = $query->latest()->paginate(10)->withQueryString();
+
+    return view('pages.admin.mapel.index', compact('proposals'));
+}
+
 
     public function accByAdmin($id)
 {

@@ -44,8 +44,15 @@ class LPJController extends Controller
         'anggaran.*.satuan' => 'required|string',
         'anggaran.*.harga_satuan' => 'required|numeric',
         'anggaran.*.jumlah_total' => 'required|numeric',
+        'anggaran.*.nota' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
         'dokumentasi.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'nota.*' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
+        'nota.*' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        // Rundown
+            'rundown' => 'required|array|min:1',
+            'rundown.*.jam' => 'required|string',
+            'rundown.*.durasi' => 'required|string',
+            'rundown.*.kegiatan' => 'required|string',
+            'rundown.*.penanggung_jawab' => 'required|string',
     ]);
 
     $userId = auth()->id();
@@ -79,12 +86,16 @@ class LPJController extends Controller
 
     // Handle upload nota
     $notaPaths = [];
-    if ($request->hasFile('nota')) {
-        foreach ($request->file('nota') as $file) {
-            $path = $file->store('public/nota');
-            $notaPaths[] = str_replace('public/', 'storage/', $path);
-        }
+foreach ($request->anggaran as $i => $item) {
+    if (isset($item['nota']) && $item['nota']->isValid()) {
+        $file = $item['nota'];
+        $path = $file->store('public/nota');
+        $notaPaths[] = [
+            'uraian' => $item['uraian'],
+            'path' => str_replace('public/', 'storage/', $path)
+        ];
     }
+}
 
     // Load template LPJ
     $templatePath = public_path('template/format_lpj.docx');
@@ -129,6 +140,21 @@ class LPJController extends Controller
         $templateProcessor->setValue("jumlah_total#{$i}", 'Rp. ' . number_format($item['jumlah_total'], 0, ',', '.'));
     }
 
+    // Untuk rundown
+    //Rundown
+$rundownList = $request->rundown;
+$rundownCount = count($rundownList);
+$templateProcessor->cloneRow('no', $rundownCount);
+
+foreach ($rundownList as $index => $item) {
+    $i = $index + 1;
+    $templateProcessor->setValue("no#{$i}", $i);
+    $templateProcessor->setValue("jam#{$i}", $item['jam']);
+    $templateProcessor->setValue("durasi#{$i}", $item['durasi']);
+    $templateProcessor->setValue("kegiatan#{$i}", $item['kegiatan']);
+    $templateProcessor->setValue("penanggung_jawab#{$i}", $item['penanggung_jawab']);
+}
+
     // Untuk dokumentasi
 if (!empty($dokumentasiPaths)) {
     $templateProcessor->cloneBlock('dokumentasi_block', count($dokumentasiPaths), true, true);
@@ -145,27 +171,40 @@ foreach ($dokumentasiPaths as $index => $path) {
 }
 }
 
-// Untuk nota
-if (!empty($notaPaths)) {
-    $templateProcessor->cloneBlock('nota_block', count($notaPaths), true, true);
-
-foreach ($notaPaths as $index => $path) {
-    $i = $index + 1;
+$notaBlocks = [];
+foreach ($notaPaths as $index => $nota) {
+    $path = $nota['path'];
+    $uraian = $nota['uraian'];
     $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
-    $templateProcessor->setValue("no_nota#$i", $i);
-    
+    $entry = [
+        'no_nota' => $index + 1,
+        'keterangan_nota' => $uraian,
+    ];
+
     if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
-        $templateProcessor->setImageValue("gambar_nota#$i", [
+        $entry['gambar_nota'] = [
             'path' => storage_path('app/public/' . str_replace('storage/', '', $path)),
             'width' => 400
-        ]);
+        ];
     } else {
-        $templateProcessor->setValue("gambar_nota#$i", '[PDF] ' . basename($path));
+        $entry['gambar_nota'] = '[PDF] ' . basename($path);
     }
 
-    $templateProcessor->setValue("keterangan_nota#$i", "Nota $i");
+    $notaBlocks[] = $entry;
 }
+
+$templateProcessor->cloneBlock('nota_block', count($notaBlocks), true, true);
+
+foreach ($notaBlocks as $i => $values) {
+    foreach ($values as $key => $value) {
+        $tag = "{$key}#" . ($i + 1);
+        if (is_array($value)) {
+            $templateProcessor->setImageValue($tag, $value);
+        } else {
+            $templateProcessor->setValue($tag, $value);
+        }
+    }
 }
 
     // Simpan file Word hasil generate
@@ -327,14 +366,28 @@ public function download($id)
     }
     
 }
-public function listLPJAdmin()
+public function listLpjAdmin(Request $request)
 {
-    $lpjs = LPJ::where('status', '!=', 'acc_final')
-               ->where('periode_id', periode_terpilih_id()) // Tambahkan filter periode
-               ->get();
+    $query = LPJ::where('status', '!=', 'acc_final')
+                ->where('periode_id', periode_terpilih_id());
 
-    return view('pages.admin.LPJ.index', compact('lpjs'));
+    if ($request->filled('search')) {
+        $query->where('judul_kegiatan', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    if ($request->filled('tanggal')) {
+        $query->whereDate('created_at', $request->tanggal);
+    }
+
+    $lpjs = $query->latest()->paginate(10)->withQueryString();
+
+    return view('pages.admin.lpj.index', compact('lpjs'));
 }
+
 
 
     public function accByAdmin($id)

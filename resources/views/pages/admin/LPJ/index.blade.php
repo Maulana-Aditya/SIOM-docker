@@ -17,6 +17,41 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
+        {{-- Filter Form --}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="GET" action="{{ route('admin.lpj.list') }}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Cari Judul</label>
+                            <input type="text" name="search" id="search" value="{{ request('search') }}" class="form-control" placeholder="Masukkan judul...">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Filter Status</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">-- Semua Status --</option>
+                                <option value="pending_admin" {{ request('status') == 'pending_admin' ? 'selected' : '' }}>Menunggu Admin</option>
+                                <option value="pending_pembina" {{ request('status') == 'pending_pembina' ? 'selected' : '' }}>Diproses Pembina</option>
+                                <option value="pending_kemahasiswaan" {{ request('status') == 'pending_kemahasiswaan' ? 'selected' : '' }}>Diproses Kemahasiswaan</option>
+                                <option value="revisi_admin" {{ request('status') == 'revisi_admin' ? 'selected' : '' }}>Revisi Admin</option>
+                                <option value="acc" {{ request('status') == 'acc' ? 'selected' : '' }}>Disetujui</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="tanggal" class="form-label">Tanggal Pengajuan</label>
+                            <input type="date" name="tanggal" id="tanggal" value="{{ request('tanggal') }}" class="form-control">
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" type="submit">Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header">
                 <h4>Daftar LPJ</h4>
@@ -27,6 +62,7 @@
                         <thead class="table-primary text-center">
                             <tr>
                                 <th>Judul Kegiatan</th>
+                                <th>Pengusul</th>
                                 <th>Status</th>
                                 <th>File LPJ</th>
                                 <th>File Revisi</th>
@@ -38,6 +74,7 @@
                             @forelse ($lpjs as $lpj)
                                 <tr>
                                     <td>{{ $lpj->judul_kegiatan }}</td>
+                                    <td>{{ $lpj->user->name }}</td>
                                     <td>
                                         @if ($lpj->status == 'pending_admin')
                                             <span class="badge bg-warning text-dark">Menunggu Admin</span>
@@ -52,9 +89,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('lpj.viewPdf', ['id' => $lpj->id]) }}"
-                                           class="btn btn-info btn-sm text-nowrap"
-                                           >
+                                        <a href="{{ route('lpj.viewPdf', $lpj->id) }}" class="btn btn-info btn-sm">
                                             <i class="fas fa-file-pdf me-1"></i> View PDF
                                         </a>
                                     </td>
@@ -68,22 +103,16 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($lpj->catatan_revisi)
-                                            {{ $lpj->catatan_revisi }}
-                                        @else
-                                            <span class="text-muted">Tidak Ada</span>
-                                        @endif
+                                        {{ $lpj->catatan_revisi ?? 'Tidak Ada' }}
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2">
-                                            <!-- Tombol ACC -->
                                             <a href="{{ route('lpj.acc.admin', $lpj->id) }}" 
                                                class="btn btn-success btn-sm"
                                                onclick="return confirm('Yakin ingin ACC LPJ ini?');">
                                                 ACC
                                             </a>
 
-                                            <!-- Tombol Revisi -->
                                             <button type="button" 
                                                     class="btn btn-warning btn-sm"
                                                     data-bs-toggle="modal" 
@@ -91,8 +120,7 @@
                                                 Revisi
                                             </button>
 
-                                            <!-- Tombol Hapus -->
-                                            <form action="{{ route('lpj.hapus', $lpj->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus LPJ ini?');">
+                                            <form action="{{ route('lpj.hapus', $lpj->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus LPJ ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
@@ -108,27 +136,28 @@
                                             <form action="{{ route('lpj.revisi.admin', $lpj->id) }}" method="POST" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="modalRevisiLabel{{ $lpj->id }}">Kirim Revisi LPJ</h5>
+                                                    <h5 class="modal-title">Kirim Revisi LPJ</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="mb-3">
-                                                        <label for="catatanRevisi{{ $lpj->id }}" class="form-label">Catatan Revisi</label>
-                                                        <textarea name="catatan_revisi" id="catatanRevisi{{ $lpj->id }}" class="form-control" rows="3" required></textarea>
+                                                        <label class="form-label">Catatan Revisi</label>
+                                                        <textarea name="catatan_revisi" class="form-control" rows="3" required></textarea>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label for="fileRevisi{{ $lpj->id }}" class="form-label">Upload File Revisi</label>
-                                                        <input type="file" name="file_revisi" id="fileRevisi{{ $lpj->id }}" class="form-control" accept=".docx,.pdf">
+                                                        <label class="form-label">Upload File Revisi</label>
+                                                        <input type="file" name="file_revisi" class="form-control" accept=".pdf,.docx">
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" class="btn btn-warning">Kirim Revisi</button>
+                                                    <button type="submit" class="btn btn-warning">Kirim</button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
+
                             @empty
                                 <tr>
                                     <td colspan="6" class="text-center">Tidak ada LPJ masuk.</td>
@@ -136,6 +165,11 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Pagination --}}
+                <div class="mt-3">
+                    {{ $lpjs->links() }}
                 </div>
             </div>
         </div>

@@ -14,7 +14,7 @@ class PengaturanDanaController extends Controller
 {
     $periodeId = periode_terpilih_id();
 
-    $userIds = User::where('roles', 'siswa')->pluck('id');
+    $userIds = User::where('roles', 'ormawa')->pluck('id');
 
     foreach ($userIds as $userId) {
         $cek = PengaturanDana::where('user_id', $userId)

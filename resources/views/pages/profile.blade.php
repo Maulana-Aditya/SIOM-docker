@@ -90,7 +90,7 @@
                             </div>
 
 
-                        @elseif (Auth::user()->roles == 'siswa')
+                        @elseif (Auth::user()->roles == 'ormawa')
                             <div class="col-12 col-md-12 col-lg-12">
                                 <div class="card">
                                     <form action="{{ route('update.profile') }}" method="POST"

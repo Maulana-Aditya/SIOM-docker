@@ -45,6 +45,8 @@
                     href="{{ route('admin.periode.index') }}">
                     <i class="bi bi-calendar"></i> <span>Atur Periode</span>
                 </a>
+                <li class="{{ request()->routeIs('pengumuman.*') ? 'active' : '' }}"><a class="nav-link"
+                    href="{{ route('pengumuman.index') }}"><i class="fas fa-bullhorn"></i> <span>Pengumuman</span></a></li>
 
                 {{--
             <li class="{{ request()->routeIs('kelas.*') ? 'active' : '' }}"><a class="nav-link"
@@ -59,11 +61,7 @@
             <li class="{{ request()->routeIs('user.*') ? 'active' : '' }}"><a class="nav-link"
                     href="{{ route('user.index') }}"><i class="fas fa-user"></i> <span>User</span></a></li>
             
-            <li class="{{ request()->routeIs('pengumuman-sekolah.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('pengumuman-sekolah.index') }}"><i class="fas fa-bullhorn"></i> <span>Pengumuman</span></a></li>
-
-            {{-- <li class="{{ request()->routeIs('pengumuman-sekolah.*') ? 'active' : '' }}"><a class="nav-link"
-                    href="{{ route('pengumuman-sekolah.index') }}"><i class="fas fa-bullhorn"></i>
-                    <span>Pengumuman</span></a></li> --}}
+           
 
             <li class="{{ request()->routeIs('pengaturan.*') ? 'active' : '' }}"><a class="nav-link"
                     href="{{ route('pengaturan.index') }}"><i class="fas fa-cog"></i> <span>Pengaturan</span></a></li>

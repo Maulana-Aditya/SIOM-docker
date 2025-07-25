@@ -96,13 +96,15 @@
                                                     <option value="">-- Pilih Roles --</option>
                                                     <option value="admin" {{ old('roles') == 'admin' ? 'selected' : '' }}>
                                                         Admin</option>
-                                                    <option value="guru" {{ old('roles') == 'guru' ? 'selected' : '' }}>
-                                                        Guru</option>
-                                                    <option value="siswa" {{ old('roles') == 'siswa' ? 'selected' : '' }}>
-                                                        Siswa</option>
-                                                    <option value="orangtua"
-                                                        {{ old('roles') == 'orangtua' ? 'selected' : '' }}>Orangtua
-                                                    </option>
+                                                    <option value="ormawa" {{ old('roles') == 'ormawa' ? 'selected' : '' }}>
+                                                        Ormawa</option>
+                                                    <option value="pembina" {{ old('roles') == 'pembina' ? 'selected' : '' }}>
+                                                        Pembina</option>
+                                                    <option value="kaprodi" {{ old('roles') == 'kaprodi' ? 'selected' : '' }}>
+                                                        Kaprodi</option>
+                                                    <option value="kemahasiswaan" {{ old('roles') == 'kemahasiswaan' ? 'selected' : '' }}>
+                                                        Kemahasiswaan</option>
+                                    
                                                 </select>
                                             </div>
                                             <div class="form-group" id="noId"></div>
@@ -145,42 +147,47 @@
     </script>
     <script>
         $(document).ready(function() {
-            $('#roles').change(function() {
-                var kel = $('#roles option:selected').val();
-                if (kel == "guru") {
-                    $("#noId").html(
-                        '<label for="nip">NIP guru</label><input id="nip" type="text" onkeypress="return inputAngka(event)" placeholder="NIP Guru" class="form-control" name="nip" value="{{ old('nip') }}" autocomplete="off">'
-                    );
-                } else if (kel == "siswa") {
-                    $("#noId").html(
-                        '<label for="nis">NIS Siswa</label><input id="nis" type="text" placeholder="NIS Siswa" class="form-control" name="nis" value="{{ old('nis') }}" autocomplete="off">'
-                    );
-                } else if (kel == "admin") {
-                    $("#noId").html(
-                        '<label for="name">Nama Admin</label><input id="name" type="text" placeholder="Nama admin" class="form-control" name="name" value="{{ old('name') }}" autocomplete="off">'
-                    );
-                } else if (kel == "orangtua") {
-                    $("#noId").html(`
-                <label for="name">Nama</label>
-                <input id="name" type="text" placeholder="Nama" class="form-control" name="name" value="{{ old('name') }}" autocomplete="off">
-                <label for="no_telp">No Telepon</label>
-                <input id="no_telp" type="text" placeholder="No Telepon" class="form-control" name="no_telp" value="{{ old('no_telp') }}" autocomplete="off">
-                <label for="alamat">Alamat</label>
-                <input id="alamat" type="text" placeholder="Alamat" class="form-control" name="alamat" value="{{ old('alamat') }}" autocomplete="off">
-                <label for="siswa">Daftar Siswa</label>
-                <select id="siswa" name="siswa[]" class="select2 form-control" multiple="multiple">
-                    @foreach ($siswaList as $siswa)
-                        <option value="{{ $siswa->id }}" {{ in_array($siswa->id, old('siswa', [])) ? 'selected' : '' }}>{{ $siswa->user->name }}</option>
-                    @endforeach
-                </select>
-            `);
+           $('#roles').change(function () {
+    var kel = $('#roles option:selected').val();
+    if (kel == "guru") {
+        $("#noId").html(
+            '<label for="nip">NIP guru</label><input id="nip" type="text" placeholder="NIP Guru" class="form-control" name="nip" value="{{ old('nip') }}" autocomplete="off">'
+        );
+    } else if (kel == "siswa") {
+        $("#noId").html(
+            '<label for="nis">NIS Siswa</label><input id="nis" type="text" placeholder="NIS Siswa" class="form-control" name="nis" value="{{ old('nis') }}" autocomplete="off">'
+        );
+    } else if (kel == "admin" || kel == "ormawa" || kel == "kaprodi" || kel == "kemahasiswaan") {
+        $("#noId").html(`
+            <label for="name">Nama</label>
+            <input id="name" type="text" placeholder="Nama Lengkap" class="form-control" name="name" value="{{ old('name') }}" autocomplete="off">
+            <label for="ormawa">Ormawa</label>
+            <input id="ormawa" type="text" placeholder="Nama Ormawa (jika ada)" class="form-control" name="ormawa" value="{{ old('ormawa') }}" autocomplete="off">
+            <label for="prodi">Program Studi</label>
+            <input id="prodi" type="text" placeholder="Program Studi (jika ada)" class="form-control" name="prodi" value="{{ old('prodi') }}" autocomplete="off">
+        `);
+    } else if (kel == "orangtua") {
+        $("#noId").html(`
+            <label for="name">Nama</label>
+            <input id="name" type="text" placeholder="Nama" class="form-control" name="name" value="{{ old('name') }}" autocomplete="off">
+            <label for="no_telp">No Telepon</label>
+            <input id="no_telp" type="text" placeholder="No Telepon" class="form-control" name="no_telp" value="{{ old('no_telp') }}" autocomplete="off">
+            <label for="alamat">Alamat</label>
+            <input id="alamat" type="text" placeholder="Alamat" class="form-control" name="alamat" value="{{ old('alamat') }}" autocomplete="off">
+            <label for="siswa">Daftar Siswa</label>
+            <select id="siswa" name="siswa[]" class="select2 form-control" multiple="multiple">
+                @foreach ($siswaList as $siswa)
+                    <option value="{{ $siswa->id }}" {{ in_array($siswa->id, old('siswa', [])) ? 'selected' : '' }}>{{ $siswa->user->name }}</option>
+                @endforeach
+            </select>
+        `);
+        $('.select2').select2(); // Init ulang Select2
+    } else {
+        $("#noId").html("");
+    }
+});
 
-                    // Reinitialize select2 for the dynamically added select element
-                    $('.select2').select2();
-                } else {
-                    $("#noId").html("");
-                }
-            });
+
         });
     </script>
 @endpush

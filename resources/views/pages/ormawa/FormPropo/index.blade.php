@@ -26,6 +26,7 @@
                         'tahun' => 'Tahun',
                         'ormawa' => 'Ormawa',
                         'dari' => 'Dari',
+                        'tanggal_kegiatan' => 'Tanggal Kegiatan',
                         'surat_edaran' => 'Surat Edaran',
                         'tanggal_rapat' => 'Tanggal Rapat',
                         'tanggal_surat_edaran' => 'Tanggal Surat Edaran',
@@ -33,7 +34,10 @@
                     ] as $name => $label)
                         <div class="form-group mb-2">
                             <label>{{ $label }}</label>
-                            <input type="{{ in_array($name, ['tanggal_rapat', 'tanggal_surat_edaran']) ? 'date' : 'text' }}" name="{{ $name }}" class="form-control" required>
+                            <input type="{{ in_array($name, ['tanggal_rapat', 'tanggal_surat_edaran', 'tanggal_kegiatan']) ? 'date' : 'text' }}" name="{{ $name }}" class="form-control" required>
+                            @error($name)
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
                         </div>
                     @endforeach
                 </div>
